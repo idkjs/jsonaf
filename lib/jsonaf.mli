@@ -46,8 +46,26 @@ type bigstring = Angstrom.bigstring
 val parse : t Angstrom.t
 val serialize : t -> Faraday.t -> unit
 
-val of_string    : string    -> (t, string) Result.result
-val of_bigstring : bigstring -> (t, string) Result.result
+val of_string    : string    -> consume:Angstrom.Consume.t ->([> `Array of 'a list
+             | `False
+             | `Null
+             | `Number of string
+             | `Object of (string * 'a) list
+             | `String of string
+             | `True ]
+            as 'a, string) result
+val of_bigstring :
+           bigstring ->
+           consume:Angstrom.Consume.t ->
+           ([> `Array of 'a list
+             | `False
+             | `Null
+             | `Number of string
+             | `Object of (string * 'a) list
+             | `String of string
+             | `True ]
+            as 'a, string)
+           result
 
 val to_string    : t -> string
 val to_bigstring : t -> bigstring
@@ -72,15 +90,33 @@ module With_number : sig
     -> Faraday.t
     -> unit
 
-  val of_string
-    : (string -> ('number, string) Result.result)
-    -> string
-    -> ('number t, string) Result.result
+  val of_string :
+           (string -> ('a, string) result) ->
+           string ->
+           consume:Angstrom.Consume.t ->
+           ([> `Array of 'b list
+             | `False
+             | `Null
+             | `Number of 'a
+             | `Object of (string * 'b) list
+             | `String of string
+             | `True ]
+            as 'b, string)
+           result
 
-  val of_bigstring
-    : (string -> ('number, string) Result.result)
-    -> Angstrom.bigstring
-    -> ('number t, string) Result.result
+  val of_bigstring :
+           (string -> ('a, string) result) ->
+           bigstring ->
+           consume:Angstrom.Consume.t ->
+           ([> `Array of 'b list
+             | `False
+             | `Null
+             | `Number of 'a
+             | `Object of (string * 'b) list
+             | `String of string
+             | `True ]
+            as 'b, string)
+           result
 
   val to_string
     :  (Faraday.t -> 'number -> unit)
